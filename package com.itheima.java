@@ -1,0 +1,385 @@
+package com.itheima.studentsystem;
+
+import java.util.ArrayList;
+import java.util.Random;
+import java.util.Scanner;
+
+public class App {
+    public static void main(String[] args) {
+        ArrayList<User> list = new ArrayList<>();
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            System.out.println("Welcome to student management system");
+            System.out.println("Please select 1.Login 2.Register 3.Forget password");
+            String choose = sc.next();
+            switch (choose) {
+                case "1" -> login(list);
+                case "2" -> register(list);
+                case "3" -> forgetPassword(list);
+                case "4" -> {
+                    System.out.println("Thank you bye");
+                    System.exit(0);
+                }
+                default -> System.out.println("No such choice");
+            }
+        }
+    }
+
+    private static void login(ArrayList<User> list) {
+        Scanner sc = new Scanner(System.in);
+        for (int i = 0; i < 3; i++) {
+            System.out.println("Type username");
+            String username = sc.next();
+            //Judge if username exists
+            boolean flag = contains(list, username);
+            if (!flag) {
+                System.out.println("username" + username + "is unregistered. Please try again");
+                return;
+            }
+
+            System.out.println("Type password");
+            String password = sc.next();
+
+
+            while (true) {
+                String rightCode = getCode();
+                System.out.println("The correct security code is：" + rightCode);
+                System.out.println("Please type security code");
+                String code = sc.next();
+                if (code.equalsIgnoreCase(rightCode)) {
+                    System.out.println("Correct");
+                    break;
+                } else {
+                    System.out.println("Wrong");
+                    continue;
+                }
+            }
+
+            // Verify if the username and password are correct
+            // Check if the collection contains the username and password
+            // Define a method to verify if the username and password are correct
+            // Application of encapsulation concept:
+            // We can encapsulate scattered data into an object
+            // In the future, when passing parameters, we only need to pass a whole object instead of worrying about scattered data.
+            User useInfo = new User(username, password, null, null);
+            boolean result = checkUserInfo(list, useInfo);
+            if (result) {
+                System.out.println("Successfully logged in");
+                // Create an object to call the method and start the student management system
+                StudentSystem ss = new StudentSystem();
+                StudentSystem ss = new StudentSystem();
+                ss.startStudentSystem();
+                break;
+            } else {
+                System.out.println("log in failed,incorrect username and password");
+                if (i == 2) {
+                    System.out.println("The account" + username + "is locked");
+                    //After the account is locked, end the method
+                    return;
+                } else {
+                    System.out.println("Wrong username or password，you have" + (2 - i) + "oppotunities left");
+                }
+            }
+
+        }
+
+    }
+
+    private static boolean checkUserInfo(ArrayList<User> list, User useInfo) {
+        //Iterate through the collection to determine if the user exists; if it exists, login is successful; if not, login fails
+        for (int i = 0; i < list.size(); i++) {
+            User user = list.get(i);
+            if (user.getUsername().equals(useInfo.getUsername()) && user.getPassword().equals(useInfo.getPassword())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void forgetPassword(ArrayList<User> list) {
+        Scanner sc = new Scanner(System.in);
+        System.out.println("Type username");
+        String username = sc.next();
+        boolean flag = contains(list, username);
+        if (!flag) {
+            System.out.println("User" + username + "not registered. Please register first");
+            return;
+        }
+
+        //Enter the ID card number and phone number from the keyboard
+        System.out.println("Please enter your ID card number");
+        String personID = sc.next();
+        System.out.println("Please enter your phone number");
+        String phoneNumber = sc.next();
+
+
+        //Get the user object by index
+        int index = findIndex(list, username);
+        User user = list.get(index);
+        //Compare whether the phone number and ID card number in the user object are the same
+        if(!(user.getPersonID().equalsIgnoreCase(personID) && user.getPhoneNumber().equals(phoneNumber))){
+            System.out.println("Incorrect ID card number or phone number, password cannot be changed");
+            return;
+        }
+
+
+        // When the code executes here, all data has been successfully verified and can be modified directly
+        String password;
+        while (true) {
+            System.out.println("Please enter a new password");
+            password = sc.next();
+            System.out.println("Please re-enter the new password");
+            String againPassword = sc.next();
+            if(password.equals(againPassword)){
+                System.out.println("The two passwords are the same");
+                break;
+            }else{
+                System.out.println("The two passwords are not the same, please re-enter");
+                continue;
+            }
+        }
+
+        //Modify the password directly
+        user.setPassword(password);
+        System.out.println("Password changed successfully");
+
+    }
+
+    private static int findIndex(ArrayList<User> list, String username) {
+        for (int i = 0; i < list.size(); i++) {
+            User user = list.get(i);
+            if(user.getUsername().equals(username)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static void register(ArrayList<User> list) {
+        //1.scan input from keyboard
+        Scanner sc = new Scanner(System.in);
+        String username;
+        while (true) {
+            System.out.println("Please enter a username");
+            username = sc.next();
+            //Development detail: First verify if the format is correct, then verify if it is unique
+            // Because in the future all data will be stored in the database, if we want to check, we need to use network resources.
+            boolean flag1 = checkUsername(username);
+            if (!flag1) {
+                System.out.println("The username format does not meet the requirements. Please re-enter");
+                continue;
+            }
+
+            //Check uniqueness of username 
+            //Check if the username exists in the list
+            boolean flag2 = contains(list, username);
+            if (flag2) {
+                //If the username already exists, the current username cannot be registered and needs to be re-entered
+                System.out.println("The username " + username + " already exists, please re-enter");
+            } else {
+                //If not exist, it means the current username is available and can continue to enter other data
+                System.out.println("Username" + username + "is available");
+                break;
+            }
+        }
+        
+        
+        //2.Enter the password from the keyboard
+        //The password is entered twice from the keyboard, and registration is possible only if the two inputs are consistent.
+        String password;
+        String password;
+        while (true) {
+            System.out.println("Please enter the password to be registered");
+            password = sc.next();
+            System.out.println("Please re-enter the password to be registered");
+            String againPassword = sc.next();
+            if (!password.equals(againPassword)) {
+                System.out.println("The two passwords entered are inconsistent, please re-enter");
+                continue;
+            } else {
+                System.out.println("The two passwords entered are inconsistent");
+                break;
+            }
+        }
+        //3.Enter ID number from keyboard
+        String personID;
+        while (true) {
+            System.out.println("Please enter your ID number");
+        personID = sc.next();
+        boolean flag = checkPersonID(personID);
+        if (flag) {
+        System.out.println("ID number meets the requirements");
+        break;
+        } else {
+        System.out.println("ID number format is incorrect, please re-enter");
+        continue;
+        }
+        }
+        //4. Enter phone number from the keyboard
+        String phoneNumber;
+        while (true) {
+        System.out.println("Please enter your phone number");
+        phoneNumber = sc.next();
+        boolean flag = checkPhoneNumber(phoneNumber);
+        if (flag) {
+        System.out.println("Phone number format is correct");
+        break;
+        } else {
+        System.out.println("Phone number format is incorrect, please re-enter");
+        continue;
+        }
+        }
+        //Put username, password, ID number, and phone number into the user object
+        User u = new User(username, password, personID, phoneNumber);
+        //Add the user object to the collection
+        list.add(u);
+        System.out.println("Registration successful");
+
+                //Traverse the collection
+                printList(list);
+
+
+    }
+
+    private static void printList(ArrayList<User> list) {
+        for (int i = 0; i < list.size(); i++) {
+            //i index
+            User user = list.get(i);
+            System.out.println(user.getUsername() + ", " + user.getPassword() + ", "
+                    + user.getPersonID() + ", " + user.getPhoneNumber());
+        }
+    }
+
+    private static boolean checkPhoneNumber(String phoneNumber) {
+        // Must be 11 digits long
+        if (phoneNumber.length() != 11) {
+        return false;
+        }
+        // Cannot start with 0
+        if (phoneNumber.startsWith("0")) {
+        return false;
+        }
+        // Must be all digits
+        for (int i = 0; i < phoneNumber.length(); i++) {
+        char c = phoneNumber.charAt(i);
+        if (!(c >= '0' && c <= '9')) {
+        return false;
+        }
+        }
+        // After the loop ends, it means every character is between 0-9
+        return true;
+        }
+
+        private static boolean checkPersonID(String personID) {
+            // Must be 18 digits long
+            if (personID.length() != 18) {
+                return false;
+            }
+            // Cannot start with 0
+            if (personID.startsWith("0")) {
+                // If it starts with 0, then return false
+                return false;
+            }
+            // The first 17 digits must be all digits
+            for (int i = 0; i < personID.length() - 1; i++) {
+                char c = personID.charAt(i);
+                // If there's a character not between 0-9, then return false directly
+                if (!(c >= '0' && c <= '9')) {
+                    return false;
+                }
+            }
+            // The last digit can be a number, or an uppercase X or a lowercase x
+            char endChar = personID.charAt(personID.length() - 1);
+            if ((endChar >= '0' && endChar <= '9') || (endChar == 'x') || (endChar == 'X')) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        private static boolean contains(ArrayList<User> list, String username) {
+            // Iterate through the collection to get each user object
+            // Compare the username in the user object
+            for (int i = 0; i < list.size(); i++) {
+                // i index
+                User user = list.get(i);
+                String rightUsername = user.getUsername();
+                if (rightUsername.equals(username)) {
+                    return true;
+                }
+            }
+            // When the loop ends, it means all users in the collection have been compared, and there are no duplicates, so return false
+            return false;
+        }
+        
+        private static boolean checkUsername(String username) {
+            // The username length must be between 3 and 15 characters
+            int len = username.length();
+            if (len < 3 || len > 15) {
+                return false;
+            }
+            // When the code executes to this point, it means the username length meets the requirements.
+            // Continue validation: can only be a combination of letters and numbers
+            // Iterate through each character in username, if there's a character that is not a letter or a number, then return false
+            for (int i = 0; i < username.length(); i++) {
+                // i index
+                char c = username.charAt(i);
+                if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9'))) {
+                    return false;
+                }
+            }
+            // When the code executes to this point, what does it mean?
+            // The username meets two requirements: 1. length requirement 2. content requirement (letters + numbers)
+            // However, it cannot be all numbers
+            // Count how many letters are in the username.
+            int count = 0;
+            for (int i = 0; i < username.length(); i++) {
+            // i is the index
+            char c = username.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+            count++;
+            break;
+            }
+            }
+            return count > 0;
+            }
+            
+            private static String getCode() {
+            // 1. Create an ArrayList to store all the uppercase and lowercase letters.
+            ArrayList<Character> list = new ArrayList<>();
+            for (int i = 0; i < 26; i++) {
+            list.add((char) ('a' + i));
+            list.add((char) ('A' + i));
+            }
+
+            StringBuilder sb = new StringBuilder();
+            // 2. Randomly select 4 characters.
+            Random r = new Random();
+            for (int i = 0; i < 4; i++) {
+                // Get random index.
+                int index = r.nextInt(list.size());
+                // Use the random index to get a character.
+                char c = list.get(index);
+                // Add the random character to sb.
+                sb.append(c);
+            }
+            
+            // 3. Add a random number at the end.
+            int number = r.nextInt(10);
+            sb.append(number);
+            
+            // 4. If we want to modify the content of the string,
+            // first convert the string to a character array, modify it in the array,
+            // and then create a new string.
+            char[] arr = sb.toString().toCharArray();
+            // Get a random index and swap the last element with the element at the random index.
+            int randomIndex = r.nextInt(arr.length);
+            // Swap the element at the max index with the element at the random index.
+            char temp = arr[randomIndex];
+            arr[randomIndex] = arr[arr.length - 1];
+            arr[arr.length - 1] = temp;
+            return new String(arr);
+
+    }
+
+}
