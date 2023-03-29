@@ -117,7 +117,6 @@ public class App {
                 System.out.println("Successfully logged in");
                 // Create an object to call the method and start the student management system
                 StudentSystem ss = new StudentSystem();
-                StudentSystem ss = new StudentSystem();
                 ss.startStudentSystem();
                 break;
             } else {
@@ -236,7 +235,6 @@ public class App {
         
         //2.Enter the password from the keyboard
         //The password is entered twice from the keyboard, and registration is possible only if the two inputs are consistent.
-        String password;
         String password;
         while (true) {
             System.out.println("Please enter the password to be registered");
